@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bio Platformer</title>
+  <style>
+    body {
+      margin: 0;
+      background: #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    canvas {
+      background: #333;
+      border: 2px solid white;
+    }
+  </style>
+</head>
+<body>
+
+    <script>
+        const bgMusic = new Audio("bg.mp3");
+        bgMusic.loop = true;
+      
+        window.addEventListener("keydown", () => {
+          if (bgMusic.paused) {
+            bgMusic.play();
+          }
+        });
+      </script>
+
+<a href="info.html" target="_blank" 
+     style="
+       position: absolute; 
+       top: 28px; 
+       right: 50px; 
+       font-family: Arial, sans-serif; 
+       font-size: 20px; 
+       color: white; 
+       text-decoration: underline;">
+    Info
+</a>
+
+<canvas id="game" width="1300" height="600"></canvas>
+
+<script>
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+
+  const gravity = 0.8;
+  const friction = 0.8;
+
+  // Player
+  const player = {
+    x: 150,
+    y: 400,
+    width: 40,
+    height: 40,
+    dx: 0,
+    dy: 0,
+    speed: 5,
+    jumping: false,
+    grounded: false,
+  };
+
+  // Platforms
+  const platforms = [
+    { x: 120, y: 550, width: 120, height: 17 },
+    { x: 120, y: 290, width: 120, height: 17 },
+    { x: 120, y: 100, width: 120, height: 17 },
+    { x: 350, y: 420, width: 120, height: 17 },
+    { x: 350, y: 195, width: 120, height: 17 },
+    { x: 580, y: 550, width: 120, height: 17 },
+    { x: 580, y: 290, width: 120, height: 17 },
+    { x: 580, y: 100, width: 120, height: 17 },
+    { x: 810, y: 420, width: 120, height: 17 },
+    { x: 810, y: 195, width: 120, height: 17 },
+    { x: 1040, y: 550, width: 120, height: 17 },
+    { x: 1040, y: 290, width: 120, height: 17 },
+    { x: 1040, y: 100, width: 120, height: 17 },
+  ];
+
+  // Flags
+  let flag = { x: 620, y: 520, width: 30, height: 30 };      // blue = answer 0
+  let badFlag = { x: 620, y: 70, width: 30, height: 30 };    // yellow = answer 1
+
+  // Score
+  let score = 0;
+
+  // Quiz Questions
+  const questions = [
+    {question: "Which metabolite is a key regulatory point linking glycolysis to the Krebs cycle?", answers: ["Pyruvate", "Lactate"], correct: 0 },
+    { question: "Which glycolytic enzyme catalyzes the substrate-level phosphorylation of ADP to ATP?", answers: ["Phosphoglycerate kinase", "Pyruvate kinase"], correct: 1 },
+    { question: "What type of respiration requires oxygen?", answers: ["Aerobic", "Anaerobic"], correct: 0 },
+    { question: "FADH2 contributes fewer ATP than NADH because:", answers: ["It enters at Complex II, bypassing proton pumping at Complex I", "It carries fewer electrons"], correct: 0 },
+    { question: "Which intermediate of the Krebs cycle can be diverted for fatty acid synthesis?", answers: ["Citrate", "Succinate"], correct: 0 },
+    { question: "During anaerobic respiration in yeast, what is the net ATP yield per glucose molecule?", answers: ["2 ATP", "4 ATP"], correct: 0 },
+    { question: "During gluconeogenesis, which glycolytic enzyme is bypassed using phosphoenolpyruvate carboxykinase?", answers: ["Pyruvate kinase", "Hexokinase"], correct: 0 },
+    { question: "During aerobic respiration, which organelle produces the most ATP?", answers: ["Mitochondria", "Ribosome"], correct: 0 },
+    { question: "Which enzyme catalyzes the conversion of pyruvate to Acetyl-CoA?", answers: ["Pyruvate dehydrogenase", "Citrate synthase"], correct: 0 },
+    { question: "Which process occurs in both aerobic and anaerobic respiration?", answers: ["Glycolysis", "Krebs cycle"], correct: 0 },
+    { question: "Which coenzyme is required by α-ketoglutarate dehydrogenase for decarboxylation?", answers: ["Thiamine pyrophosphate (TPP)", "Biotin"], correct: 0 },
+    { question: "Which type of fermentation produces ethanol?", answers: ["Alcoholic fermentation", "Lactic acid fermentation"], correct: 0 },
+    { question: "The malate-aspartate shuttle functions to:", answers: ["Transport cytosolic NADH into mitochondria", "Export ATP from mitochondria to cytosol"], correct: 0 },
+    { question: "Which byproduct of the Krebs cycle can be used as a precursor for amino acid synthesis?", answers: ["α-Ketoglutarate", "Succinate"], correct: 0 },
+    { question: "In the electron transport chain, which coenzyme receives electrons directly from Complex II?", answers: ["Ubiquinone (CoQ)", "Cytochrome c"], correct: 0 },
+    { question: "What molecule enters the Krebs cycle?", answers: ["Acetyl-CoA", "Glucose"], correct: 0 },
+    { question: "Which molecule is recycled in fermentation?", answers: ["NAD+", "ATP"], correct: 0 },
+    { question: "Which step in glycolysis is the key regulatory point mediated by phosphofructokinase?", answers: ["Fructose-6-phosphate to Fructose-1,6-bisphosphate", "Glucose to Glucose-6-phosphate"], correct: 0 },
+    { question: "Where does glycolysis occur in the cell?", answers: ["Cytoplasm", "Mitochondria"], correct: 0 },
+    { question: "Which molecule acts as a carrier for high-energy electrons from glycolysis to the mitochondria?", answers: ["NADH", "FADH2"], correct: 0 },
+    { question: "Which process generates ATP without oxygen?", answers: ["Fermentation", "Krebs cycle"], correct: 0 },
+    { question: "How many NADH molecules are produced per Acetyl-CoA entering the Krebs cycle?", answers: ["3", "2"], correct: 0 },
+    { question: "Which compound is broken down in glycolysis?", answers: ["Glucose", "Fatty acids"], correct: 0 },
+    { question: "Why does inhibition of Complex I decrease NADH oxidation but not FADH2 oxidation?", answers: ["FADH2 donates electrons at Complex II, downstream of Complex I", "FADH2 cannot donate electrons to ETC"], correct: 0 },
+    { question: "What gas is required for aerobic respiration?", answers: ["Oxygen", "Carbon Dioxide"], correct: 0 },
+    { question: "In the Krebs cycle, which intermediate is regenerated to continue the cycle?", answers: ["Oxaloacetate", "Fumarate"], correct: 0 },
+    { question: "What is released as a byproduct of the Krebs cycle?", answers: ["CO2", "O2"], correct: 0 },
+    { question: "Which molecule is the primary energy carrier in cells?", answers: ["ATP", "DNA"], correct: 0 },
+    { question: "Fermentation in muscles produces:", answers: ["Lactic acid", "Ethanol"], correct: 0 },
+    { question: "What is the final electron acceptor in aerobic respiration?", answers: ["Oxygen", "Carbon dioxide"], correct: 0 },
+    { question: "What is the net ATP gain from glycolysis?", answers: ["2", "4"], correct: 0 },
+    { question: "How many ATP molecules are produced from one glucose in glycolysis?", answers: ["2", "36"], correct: 0 },
+    { question: "Which enzyme catalyzes the decarboxylation of isocitrate to α-ketoglutarate?", answers: ["Isocitrate dehydrogenase", "α-Ketoglutarate dehydrogenase"], correct: 0 },
+    { question: "Which stage of respiration produces the most ATP?", answers: ["Electron transport chain", "Glycolysis"], correct: 0 },
+    { question: "Which molecule links glycolysis to the Krebs cycle?", answers: ["Pyruvate", "Glucose"], correct: 0 },
+    { question: "Which intermediate of the Krebs cycle can be diverted for fatty acid synthesis?", answers: ["Citrate", "Succinate"], correct: 0 },
+    { question: "During oxidative phosphorylation, which complex pumps protons into the intermembrane space first?", answers: ["Complex I", "Complex II"], correct: 0 },
+    { question: "During anaerobic respiration in yeast, what is the net ATP yield per glucose molecule?", answers: ["2 ATP", "4 ATP"], correct: 0 },
+    { question: "Which glycolytic enzyme catalyzes the decarboxylation of phosphoenolpyruvate?", answers: ["Pyruvate kinase", "Phosphoglycerate kinase"], correct: 1 }
+];
+
+  let currentQuestionIndex = 0;
+
+  function getCurrentQuestion() {
+    return questions[currentQuestionIndex];
+  }
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex >= questions.length) {
+        currentQuestionIndex = 0
+    }
+}
+
+  // Controls
+  const keys = {};
+  window.addEventListener("keydown", e => keys[e.code] = true);
+  window.addEventListener("keyup", e => keys[e.code] = false);
+
+  function drawRect(x, y, w, h, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, w, h);
+  }
+
+  function drawText(text, x, y, color) {
+    ctx.fillStyle = color;
+    ctx.font = "20px Arial";
+    ctx.fillText(text, x, y);
+  }
+
+  function placeFlagRandom(flagObj) {
+    let p = platforms[Math.floor(Math.random() * platforms.length)];
+    flagObj.x = p.x + Math.random() * (p.width - flagObj.width);
+    flagObj.y = p.y - flagObj.height;
+  }
+
+  function update() {
+    // Move left/right
+    if(keys["ArrowRight"] || keys["KeyD"]) {
+      player.dx = player.speed;
+    } else if(keys["ArrowLeft"] || keys["KeyA"]) {
+      player.dx = -player.speed;
+    } else {
+      player.dx *= friction;
+    }
+
+    // Jump
+    if((keys["ArrowUp"] || keys["Space"] || keys["KeyW"]) && !player.jumping && player.grounded) {
+      player.dy = -15;
+      player.jumping = true;
+      player.grounded = false;
+    }
+
+    player.dy += gravity;
+    player.x += player.dx;
+    player.y += player.dy;
+
+    // Collision with platforms
+    player.grounded = false;
+    for(let p of platforms) {
+      if(player.x < p.x + p.width &&
+         player.x + player.width > p.x &&
+         player.y < p.y + p.height &&
+         player.y + player.height > p.y) {
+        if(player.dy >= 0) {
+          player.y = p.y - player.height;
+          player.dy = 0;
+          player.jumping = false;
+          player.grounded = true;
+        }
+      }
+    }
+
+    // Boundaries
+    if(player.x < 0) player.x = 0;
+    if(player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+    if(player.y > canvas.height) { // fell off
+      player.x = 150;
+      player.y = 400;
+      player.dx = 0;
+      player.dy = 0;
+    }
+
+    // Check collisions with flags (quiz system)
+    const q = getCurrentQuestion();
+
+    // Blue flag (answer index 0)
+    if(player.x < flag.x + flag.width &&
+       player.x + player.width > flag.x &&
+       player.y < flag.y + flag.height &&
+       player.y + player.height > flag.y) {
+      if (q.correct === 0) score++; else score--;
+      nextQuestion();
+      placeFlagRandom(flag);
+      placeFlagRandom(badFlag);
+    }
+
+    // Yellow flag (answer index 1)
+    if(player.x < badFlag.x + badFlag.width &&
+       player.x + player.width > badFlag.x &&
+       player.y < badFlag.y + badFlag.height &&
+       player.y + player.height > badFlag.y) {
+      if (q.correct === 1) score++; else score--;
+      nextQuestion();
+      placeFlagRandom(flag);
+      placeFlagRandom(badFlag);
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Platforms
+    for(let p of platforms) {
+      drawRect(p.x, p.y, p.width, p.height, "white");
+    }
+
+    // Player
+    drawRect(player.x, player.y, player.width, player.height, "red");
+
+    // Flags
+    drawRect(flag.x, flag.y, flag.width, flag.height, "blue");   // answer 0
+    drawRect(badFlag.x, badFlag.y, badFlag.width, badFlag.height, "yellow"); // answer 1
+
+    // Scoreboard
+    drawText("Score: " + score, 20, 30, "white");
+
+    // Current Question
+    const q = getCurrentQuestion();
+    drawText(q.question, 20, 60, "white");
+    drawText(q.answers[0], 20, 88, "blue");
+    drawText(q.answers[1], 20, 140, "yellow");
+  }
+
+  function gameLoop() {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
+  }
+
+  placeFlagRandom(flag);
+  placeFlagRandom(badFlag);
+  gameLoop();
+</script>
+</body>
+</html>
