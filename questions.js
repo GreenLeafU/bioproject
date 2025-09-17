@@ -1,0 +1,22 @@
+const QUESTIONS = [
+    {q:'Where does glycolysis occur?', a:['Mitochondrial matrix','Cytoplasm','Inner mitochondrial membrane','Chloroplast'], correct:1, img: 'cell_diagram.png'},
+    {q:'Net ATP produced per glucose from aerobic respiration (approx.)?', a:['2 ATP','4 ATP','~30-32 ATP','~100 ATP'], correct:2},
+    {q:'Which gas is the final electron acceptor in aerobic respiration?', a:['Carbon dioxide','Oxygen','Nitrogen','Water'], correct:1},
+    {q:'Which cycle produces NADH and FADH2 for the ETC?', a:['Glycolysis','Calvin cycle','Krebs (TCA) cycle','Pentose phosphate'], correct:2},
+    {q:'Where is the electron transport chain located?', a:['Cytoplasm','Inner mitochondrial membrane','Outer mitochondrial membrane','Nuclear membrane'], correct:1},
+    {q:'What role does oxygen play?', a:['Accepts electrons in ETC','Directly produces ATP','Converts glucose to pyruvate','Stores energy'], correct:0},
+    {q:'Which stage produces the most ATP?', a:['Glycolysis','Krebs cycle','Electron transport chain','Fermentation'], correct:2},
+    {q:'Which molecule carries electrons to the ETC?', a:['ATP','NADH and FADH2','Pyruvate','O2'], correct:1},
+    {q:'Pyruvate is converted to what before entering the Krebs cycle?', a:['Acetyl-CoA','Glucose','Lactate','ATP'], correct:0},
+    {q:'Aerobic respiration yields more ATP than anaerobic because?', a:['Oxygen allows full oxidation of glucose','It has more enzymes','It happens faster','It produces more pyruvate'], correct:0},
+    {q:'Where does glycolysis occur?', a:['Mitochondrial matrix','Cytoplasm','Inner mitochondrial membrane','Chloroplast'], correct:1},
+    {q:'Net ATP produced per glucose from aerobic respiration (approx.)?', a:['2 ATP','4 ATP','~30-32 ATP','~100 ATP'], correct:2},
+    {q:'Which gas is the final electron acceptor in aerobic respiration?', a:['Carbon dioxide','Oxygen','Nitrogen','Water'], correct:1},
+    {q:'Which cycle produces NADH and FADH2 for the ETC?', a:['Glycolysis','Calvin cycle','Krebs (TCA) cycle','Pentose phosphate'], correct:2},
+    {q:'Where is the electron transport chain located?', a:['Cytoplasm','Inner mitochondrial membrane','Outer mitochondrial membrane','Nuclear membrane'], correct:1},
+    {q:'What role does oxygen play?', a:['Accepts electrons in ETC','Directly produces ATP','Converts glucose to pyruvate','Stores energy'], correct:0},
+    {q:'Which stage produces the most ATP?', a:['Glycolysis','Krebs cycle','Electron transport chain','Fermentation'], correct:2},
+    {q:'Which molecule carries electrons to the ETC?', a:['ATP','NADH and FADH2','Pyruvate','O2'], correct:1},
+    {q:'Pyruvate is converted to what before entering the Krebs cycle?', a:['Acetyl-CoA','Glucose','Lactate','ATP'], correct:0},
+    {q:'Aerobic respiration yields more ATP than anaerobic because?', a:['Oxygen allows full oxidation of glucose','It has more enzymes','It happens faster','It produces more pyruvate'], correct:0}
+  ];
